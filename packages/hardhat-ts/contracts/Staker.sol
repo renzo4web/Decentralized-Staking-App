@@ -7,8 +7,21 @@ import './ExampleExternalContract.sol';
 contract Staker {
   ExampleExternalContract public exampleExternalContract;
 
-  constructor(address exampleExternalContractAddress) public {
+  event Stake(address indexed from, uint256 indexed amount);
+
+  uint256 constant threshold = 1 ether;
+  mapping(address => uint256) public balances;
+
+  constructor(address exampleExternalContractAddress) {
     exampleExternalContract = ExampleExternalContract(exampleExternalContractAddress);
+  }
+
+  function stacke(address from, uint256 amount) public payable {
+    require(amount > 0, 'SHOULD BE GRATHER THAN ZERO');
+
+    balances[from] = amount;
+
+    emit Stake(from, amount);
   }
 
   // Collect funds in a payable `stake()` function and track individual `balances` with a mapping:
