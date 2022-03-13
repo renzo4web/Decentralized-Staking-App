@@ -53,12 +53,12 @@ contract Staker {
 
   // After some `deadline` allow anyone to call an `execute()` function
   //  It should either call `exampleExternalContract.complete{value: address(this).balance}()` to send all the value
-  function execute() public onlyWithStatus(Status.SUCCESS) {
+  function execute() public notCompleted onlyWithStatus(Status.SUCCESS) {
     exampleExternalContract.complete{value: address(this).balance}();
   }
 
   // if the `threshold` was not met, allow everyone to call a `withdraw()` function
-  function withdraw() public payable onlyWithStatus(Status.WITHDRAW) {
+  function withdraw() public payable notCompleted onlyWithStatus(Status.WITHDRAW) {
     require(balances[msg.sender] != 0, 'NOT CONTRIBUTED');
 
     (bool success, ) = payable(msg.sender).call{value: balances[msg.sender]}('');
@@ -89,6 +89,11 @@ contract Staker {
   modifier deadlineReached(bool reached) {
     uint256 timeRemaining = timeLeft();
     require(reached ? timeRemaining > 0 : timeRemaining == 0);
+    _;
+  }
+
+  modifier notCompleted() {
+    require(exampleExternalContract.completed() == false);
     _;
   }
 }
