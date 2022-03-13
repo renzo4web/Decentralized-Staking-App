@@ -27,7 +27,11 @@ contract Staker {
     currStatus = Status.STAKING;
   }
 
-  function stacke(uint256 amount) public payable deadlineReached(false) onlyWithStatus(Status.STAKING) {
+  receive() external payable {
+    stake(msg.value);
+  }
+
+  function stake(uint256 amount) public payable deadlineReached(false) onlyWithStatus(Status.STAKING) {
     require(amount > 0 && amount <= threshold, 'SHOULD BE GRATHER THAN ZERO');
 
     balances[msg.sender] = amount;
